@@ -118,6 +118,47 @@
       jalanutama.addData(data);
       map.addLayer(jalanutama); //jalanutama ditampilkan ketika halaman dipanggil
     });
+
+ /* GeoJSON Polyline */
+ var sungai = L.geoJson(null, {
+      /* Style polyline */
+      style: function (feature) { //Fungsi style polyline
+        return {
+          color: "blue", //Warna garis
+          weight: 1, //Tebal garis
+          opacity: 1, //Transparansi garis
+        };
+      },
+      /* Highlight & Popup */
+      onEachFeature: function (feature, layer) {
+        layer.on({
+          mouseover: function (e) { //Fungsi ketika mouse berada di atas obyek
+            var layer = e.target; //variabel layer
+            layer.setStyle({ //Highlight style
+              weight: 2,  //Tebal garis
+              color: "#00FFFF", //Warna garis
+              opacity: 1, //Transparansi garis
+            });
+          },
+          mouseout: function (e) { //Fungsi ketika mouse keluar dari area obyek
+            sungai.resetStyle(e.target); //Mengembalikan style garis ke style awal
+            map.closePopup(); //Menutup popup
+          },
+          click: function (e) { //Fungsi ketika obyek di-klik
+            var content = "Keterangan: " + feature.properties.KETERANGAN + "<br>" +
+              "Panjang: " + feature.properties.PANJANG_KM + " Km";
+            sungai.bindPopup(content); //Popup
+          }
+        });
+      }
+    });
+    /* memanggil data geojson polyline */
+    $.getJSON("sungai.geojson", function (data) {
+      sungai.addData(data);
+      map.addLayer(sungai); //jalanutama ditampilkan ketika halaman dipanggil
+    });
+
+  
     var GoogleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
       maxZoom: 20,
       subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
@@ -144,7 +185,8 @@
     };
     var Layers = {  //list layer
 'Jalan utama ':jalanutama,
-'Admin Desa':admindesa
+'Admin Desa':admindesa,
+'sungai ':sungai,
     };
     var layerControl = L.control.layers(baseMaps, Layers, { collapsed: false });
     layerControl.addTo(map);
